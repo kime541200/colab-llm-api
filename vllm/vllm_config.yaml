@@ -1,0 +1,22 @@
+# vLLM API Server Configuration
+# For detailed serve arguments, refer to: https://docs.vllm.ai/en/latest/cli/serve/
+
+# 1. Model settings
+model: "Qwen/Qwen2.5-1.5B-Instruct"
+trust_remote_code: false
+
+# 2. Server connection settings
+host: "0.0.0.0"
+port: 8000
+
+# 3. Resource and precision constraints (optimized for Tesla T4 GPU)
+dtype: "half"                     # Turing GPUs (T4) do not support bfloat16 natively, use 'half'. If your GPU supports it (e.g. L4, A100, A10G), you can set this to 'bfloat16' for better accuracy.
+gpu_memory_utilization: 0.7       # Limit VRAM usage to 70% to prevent OOM crash of Jupyter kernel
+max_model_len: 2048               # Limit context window to 2048 to save KV Cache memory
+
+# 4. Multi-GPU settings (optional, defaults to 1)
+tensor_parallel_size: 1
+pipeline_parallel_size: 1
+
+# 5. Security key (optional, leave null or comment out for no auth)
+api_key: null

@@ -1,0 +1,64 @@
+# llama.cpp API Server Configuration
+# For detailed server settings, refer to: https://llama-cpp-python.readthedocs.io/en/latest/server/
+
+# ==============================================================================
+# 1. Model settings (GGUF model from Hugging Face)
+# ==============================================================================
+repo_id: "Qwen/Qwen2.5-1.5B-Instruct-GGUF"
+model_file: "qwen2.5-1.5b-instruct-q4_k_m.gguf"
+model_alias: "qwen2.5-1.5b"         # OpenAI API model name
+
+# [Optional] Multimodal Projector model (corresponds to --mmproj)
+# If using a multimodal model (like LLaVA), uncomment and set the GGUF file name:
+# clip_model_path: "mmproj-model-f16.gguf" 
+
+# ==============================================================================
+# 2. Server connection settings
+# ==============================================================================
+host: "0.0.0.0"
+port: 8000
+api_key: null                       # Optional API key for auth (leave null for no auth)
+
+# ==============================================================================
+# 3. GPU offloading and context length (optimized for Tesla T4 GPU)
+# ==============================================================================
+n_gpu_layers: -1                    # -1 means offload all layers to GPU (corresponds to -ngl 99)
+n_ctx: 2048                         # Context window size (supports up to 65536 for newer architectures)
+n_batch: 512                        # Batch size for prompt processing
+
+# [Optional] Flash Attention (corresponds to -fa auto)
+flash_attn: true                    # Set true to enable Flash Attention speedup (recommended for T4+)
+
+# ==============================================================================
+# 4. Chat formatting template (Optional)
+# ==============================================================================
+# By default, llama-cpp-python will automatically parse the chat template from the GGUF file metadata.
+# Only uncomment and specify this if the model fails to follow instructions or self-loops.
+# chat_format: "qwen"                 # Chat template format (e.g. qwen, chatml, llama-3)
+
+# ==============================================================================
+# ⚙️ CLIENT-SIDE SAMPLING PARAMETERS (Reference Only)
+# Note: The parameters below (--temp, --top_p, etc.) are request-level and cannot 
+# be set globally at boot in llama-cpp-python. Please set them in your client-side
+# request payload (e.g., Python SDK or curl).
+#
+# Client Request Body Example:
+# {
+#   "model": "qwen2.5-1.5b",
+#   "messages": [{"role": "user", "content": "hello"}],
+#   "temperature": 0.6,             # --temp 0.6
+#   "top_p": 0.95,                  # --top_p 0.95
+#   "top_k": 20,                    # --top_k 20
+#   "min_p": 0.0,                   # --min_p 0.0
+#   "presence_penalty": 0.0,        # --presence_penalty 0.0
+#   "frequency_penalty": 0.0,       # --repeat-penalty 1.0 (equivalent to freq_penalty 0)
+# }
+# ==============================================================================
+
+# ==============================================================================
+# ⚠️ UN-SUPPORTED OR SYSTEM-MANAGED PARAMETERS (Reference Only)
+# - --no-webui: llama-cpp-python exposes a clean OpenAPI docs page instead of llama-server UI.
+# - -np 1 (parallel slots): Auto-managed by the FastAPI server workers.
+# - -ot (offload tensor): Used in llama.cpp to offload MoE expert layers (like Qwen3.6-35B-A3B) 
+#   partially to CPU. Not natively exposed as a simple argument in llama-cpp-python server boot.
+# ==============================================================================
